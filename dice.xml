@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="Liar's Dice">
+    <Require feature="rpc"/>
+    <Require feature="views"/>
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[
+      <script src="//hangoutsapi.appspot.com/static/hangout.js"></script>
+      <script src="http://www.corp.google.com/~peterhal/liars_dice/dice.js"></script>
+    ]]>
+  </Content>
+</Module>
