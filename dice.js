@@ -17,10 +17,13 @@ var hangout = gapi.hangout;
 var data = gapi.hangout.data;
 
 /**
+ * @param {string} id A unique id to be used to identify the shared data.
+ * @param {*} initialValue The initial value for the local user.
  * @constructor
  */
 goog.hangouts.HangoutUserData = function(id, initialValue) {
   if (id.indexOf('$') != -1) throw 'Ids cannot contain $.';
+  if (!goog.isDef(initialValue)) throw 'initialValue must be defined';
 
   base(this);
 
@@ -31,6 +34,9 @@ goog.hangouts.HangoutUserData = function(id, initialValue) {
   this.values_ = {};
 
   data.onStateChanged.add(this.dataCallback_);
+  hangout.onParticipantDisabled.add(this.dataCallback_);
+  // Force the current value to be reset.
+  this.setValue(undefined);
   this.setValue(initialValue);
 };
 goog.inherits(goog.hangouts.HangoutUserData, EventTarget);
@@ -65,8 +71,9 @@ goog.inherits(HangoutUserData.ParticipantChangedEvent, Event);
 
 HangoutUserData.prototype.disposeInternal = function() {
   data.onStateChanged.remove(this.dataCallback_);
+  hangout.onParticipantDisabled.remove(this.dataCallback_);
 
-  base(this, 'disposeInternal');  
+  base(this, 'disposeInternal');
 };
 
 
@@ -77,8 +84,10 @@ HangoutUserData.prototype.onStateChanged_ = function(event) {
   goog.object.forEach(state, function(value, key) {
     if (key.indexOf(this.keyPrefix_) == 0) {
       var participant = key.substr(this.keyPrefix_.length);
-      var value = state[key];
-      newValues[participant] = json.parse(value);
+      if (goog.isDefAndNotNull(gapi.hangout.getParticipantById(participant))) {
+        var value = state[key];
+        newValues[participant] = json.parse(value);
+      }
     }
   }, this);
 
@@ -108,7 +117,6 @@ HangoutUserData.prototype.onStateChanged_ = function(event) {
 
 
 HangoutUserData.prototype.setValue = function(value) {
-  if (!goog.isDef(value)) throw 'Value must not be undefined';
   var delta = {};
   delta[this.key_] = json.serialize(value);
   data.submitDelta(delta);
