@@ -23,7 +23,6 @@ var data = gapi.hangout.data;
  */
 goog.hangouts.HangoutUserData = function(id, initialValue) {
   if (id.indexOf('$') != -1) throw 'Ids cannot contain $.';
-  if (!goog.isDef(initialValue)) throw 'initialValue must be defined';
 
   base(this);
 
@@ -34,10 +33,9 @@ goog.hangouts.HangoutUserData = function(id, initialValue) {
   this.values_ = {};
 
   data.onStateChanged.add(this.dataCallback_);
-  hangout.onParticipantDisabled.add(this.dataCallback_);
-  // Force the current value to be reset.
-  this.setValue(undefined);
+  hangout.onEnabledParticipantsChanged.add(this.dataCallback_);
   this.setValue(initialValue);
+  this.onStateChanged_();
 };
 goog.inherits(goog.hangouts.HangoutUserData, EventTarget);
 
@@ -77,9 +75,8 @@ HangoutUserData.prototype.disposeInternal = function() {
 };
 
 
-HangoutUserData.prototype.onStateChanged_ = function(event) {
-
-  var state = event.state;
+HangoutUserData.prototype.onStateChanged_ = function() {
+  var state = data.getState();
   var newValues = {};
   goog.object.forEach(state, function(value, key) {
     if (key.indexOf(this.keyPrefix_) == 0) {
@@ -194,7 +191,7 @@ var start = function() {
   updateReadyList();
   readyStates.addEventListener(
       goog.hangouts.HangoutUserData.VALUES_CHANGED_EVENT_TYPE,
-      function() { debugger; updateReadyList(); });
+      updateReadyList);
 };
 
 gapi.hangout.onApiReady.add(start);
