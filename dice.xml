@@ -8,7 +8,8 @@
     <![CDATA[
       <script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=0.1"></script>
       <script src="http://closure-library.googlecode.com/svn/trunk/closure/goog/base.js"></script>
-      <script src="http://www.corp.google.com/~peterhal/liars_dice/dice.js"></script>
+      <script src="http://www.corp.google.com/~peterhal/liars_dice/liars-dice-deps.js"></script>
+      <script src="http://www.corp.google.com/~peterhal/liars_dice/src/dice.js"></script>
     ]]>
   </Content>
 </Module>
